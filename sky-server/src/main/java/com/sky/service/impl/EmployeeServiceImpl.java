@@ -16,7 +16,6 @@ import com.sky.exception.PasswordErrorException;
 import com.sky.mapper.EmployeeMapper;
 import com.sky.result.PageResult;
 import com.sky.service.EmployeeService;
-import org.apache.poi.util.PackageHelper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,7 +29,6 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Autowired
     private EmployeeMapper employeeMapper;
-
 
 
     /**
@@ -54,7 +52,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         //密码比对
         //对前端传过来的明文密码进行md5加密处理
-        password=DigestUtils.md5DigestAsHex(password.getBytes());
+        password = DigestUtils.md5DigestAsHex(password.getBytes());
         if (!password.equals(employee.getPassword())) {
             //密码错误
             throw new PasswordErrorException(MessageConstant.PASSWORD_ERROR);
@@ -70,9 +68,9 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public void save(EmployeeDTO employeeDTO){
-        Employee employee=new Employee();
-        BeanUtils.copyProperties(employeeDTO,employee);
+    public void save(EmployeeDTO employeeDTO) {
+        Employee employee = new Employee();
+        BeanUtils.copyProperties(employeeDTO, employee);
         employee.setStatus(StatusConstant.ENABLE);
         employee.setPassword(DigestUtils.md5DigestAsHex(PasswordConstant.DEFAULT_PASSWORD.getBytes()));
         employee.setCreateTime(LocalDateTime.now());
@@ -84,12 +82,35 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public PageResult pageQuery(EmployeePageQueryDTO employeePageQueryDTO) {
-        PageHelper.startPage(employeePageQueryDTO.getPage(),employeePageQueryDTO.getPageSize());
-        Page<Employee> page=employeeMapper.pageQuery(employeePageQueryDTO);
-        Long total =page.getTotal();
-        List<Employee> records=page.getResult();
+        PageHelper.startPage(employeePageQueryDTO.getPage(), employeePageQueryDTO.getPageSize());
+        Page<Employee> page = employeeMapper.pageQuery(employeePageQueryDTO);
+        Long total = page.getTotal();
+        List<Employee> records = page.getResult();
 
-        return new PageResult(total,records);
+        return new PageResult(total, records);
     }
 
+    @Override
+    public void status(Integer status, Long id) {
+        Employee employee = Employee.builder()
+                .status(status)
+                .id(id)
+                .build();
+        employeeMapper.status(employee);
+    }
+
+    @Override
+    public void update(EmployeeDTO employeeDTO) {
+        Employee employee=new Employee();
+        BeanUtils.copyProperties(employeeDTO,employee);
+        employee.setUpdateTime(LocalDateTime.now());
+        employee.setUpdateUser(BaseContext.getCurrentId());
+        employeeMapper.update(employee);
+    }
+
+    @Override
+    public Employee query(Integer id) {
+        return employeeMapper.query(id);
+    }
 }
+
