@@ -75,6 +75,8 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
     protected void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/doc.html").addResourceLocations("classpath:/META-INF/resources/");
         registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
+        //将图片路径映射到本地路径
+         registry.addResourceHandler("/image/**").addResourceLocations("file:C:/Users/ASUS/Desktop/sky-take-out-images/");
     }
     protected void extendMessageConverters(List<HttpMessageConverter<?>> converters){
         log.info("消息转换器");
